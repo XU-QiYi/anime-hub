@@ -1,20 +1,47 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 
-const animeList = [
-  { id: 1, title: '进击的巨人', rating: 9.8, cover: '' },
-  { id: 2, title: '鬼灭之刃', rating: 9.6, cover: '' },
-  { id: 3, title: '咒术回战', rating: 9.4, cover: '' },
-  { id: 4, title: '间谍过家家', rating: 9.5, cover: '' },
-]
+interface JikanAnime {
+  mal_id: number
+  title: string
+  images: {
+    jpg: {
+      large_image_url: string
+    }
+  }
+  score: number | null
+  genres: { name: string }[]
+}
 
 function App() {
   const [searchValue, setSearchValue] = useState('')
+  const [animeList, setAnimeList] = useState<JikanAnime[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetch('https://api.jikan.moe/v4/top/anime?limit=8')
+      .then((res) => {
+        if (!res.ok) throw new Error(`API 请求失败: ${res.status}`)
+        return res.json()
+      })
+      .then((json) => {
+        setAnimeList(json.data)
+        setLoading(false)
+      })
+      .catch((err) => {
+        setError(err.message)
+        setLoading(false)
+      })
+  }, [])
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white">
       {/* Navbar */}
       <nav className="sticky top-0 z-50 flex items-center justify-between px-6 py-3 bg-[#0a0a0a]/80 backdrop-blur-md border-b border-white/5">
-        <h1 className="text-2xl font-bold text-[#8b5cf6]">AnimeHub</h1>
+        <Link to="/" className="text-2xl font-bold text-[#8b5cf6]">
+          AnimeHub
+        </Link>
         <div className="flex items-center gap-3">
           <div className="relative">
             <svg
@@ -55,41 +82,50 @@ function App() {
       {/* Hot Recommendations */}
       <section className="px-6 py-8">
         <h2 className="text-2xl font-bold text-white mb-6">热门推荐</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {animeList.map((anime) => (
-            <div
-              key={anime.id}
-              className="group cursor-pointer rounded-xl overflow-hidden bg-white/5 border border-white/5 hover:border-[#8b5cf6]/50 hover:shadow-[0_0_24px_rgba(139,92,246,0.25)] transition-all duration-300 hover:scale-[1.03]"
-            >
-              <div className="aspect-[3/4] bg-gray-800 flex items-center justify-center">
-                <svg
-                  className="w-12 h-12 text-gray-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+
+        {loading && (
+          <div className="flex justify-center py-16">
+            <div className="w-8 h-8 border-2 border-[#8b5cf6] border-t-transparent rounded-full animate-spin" />
+          </div>
+        )}
+
+        {error && (
+          <div className="text-center py-16 text-gray-500">
+            <p>加载失败: {error}</p>
+          </div>
+        )}
+
+        {!loading && !error && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {animeList.slice(0, 8).map((anime) => (
+              <Link
+                key={anime.mal_id}
+                to={`/anime/${anime.mal_id}`}
+                className="group rounded-xl overflow-hidden bg-white/5 border border-white/5 hover:border-[#8b5cf6]/50 hover:shadow-[0_0_24px_rgba(139,92,246,0.25)] transition-all duration-300 hover:scale-[1.03]"
+              >
+                <div className="aspect-[3/4] bg-gray-800 overflow-hidden">
+                  <img
+                    src={anime.images.jpg.large_image_url}
+                    alt={anime.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    loading="lazy"
                   />
-                </svg>
-              </div>
-              <div className="p-4">
-                <h3 className="text-sm font-medium text-gray-200 truncate mb-2 group-hover:text-[#a78bfa] transition-colors">
-                  {anime.title}
-                </h3>
-                <div className="flex items-center gap-1.5">
-                  <span className="text-yellow-400 text-sm">★</span>
-                  <span className="text-yellow-400 text-sm font-medium">
-                    {anime.rating}
-                  </span>
                 </div>
-              </div>
-            </div>
-          ))}
-        </div>
+                <div className="p-4">
+                  <h3 className="text-sm font-medium text-gray-200 truncate mb-2 group-hover:text-[#a78bfa] transition-colors">
+                    {anime.title}
+                  </h3>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-yellow-400 text-sm">★</span>
+                    <span className="text-yellow-400 text-sm font-medium">
+                      {anime.score ?? '暂无'}
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </section>
     </div>
   )
