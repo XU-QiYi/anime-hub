@@ -4,12 +4,14 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import './index.css'
 import App from './App.tsx'
 import AnimeDetail from './pages/AnimeDetail.tsx'
+import Search from './pages/Search.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<App />} />
+        <Route path="/search" element={<Search />} />
         <Route path="/anime/:id" element={<AnimeDetail />} />
       </Routes>
     </BrowserRouter>

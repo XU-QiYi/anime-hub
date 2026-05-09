@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import { fetchWithRetry } from '../lib/fetchWithRetry'
 
 interface JikanAnimeDetail {
   mal_id: number
@@ -27,12 +28,8 @@ function AnimeDetail() {
   useEffect(() => {
     setLoading(true)
     setError(null)
-    fetch(`https://api.jikan.moe/v4/anime/${id}`)
-      .then((res) => {
-        if (!res.ok) throw new Error(`请求失败: ${res.status}`)
-        return res.json()
-      })
-      .then((json) => {
+    fetchWithRetry(`/api/anime/${id}`)
+      .then((json: any) => {
         setAnime(json.data)
         setLoading(false)
       })

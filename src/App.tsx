@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { fetchWithRetry } from './lib/fetchWithRetry'
 
 interface JikanAnime {
   mal_id: number
@@ -14,18 +15,24 @@ interface JikanAnime {
 }
 
 function App() {
+  const navigate = useNavigate()
   const [searchValue, setSearchValue] = useState('')
   const [animeList, setAnimeList] = useState<JikanAnime[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  function handleSearch() {
+    const q = searchValue.trim()
+    if (q) {
+      navigate(`/search?q=${encodeURIComponent(q)}`)
+    } else {
+      navigate('/search')
+    }
+  }
+
   useEffect(() => {
-    fetch('https://api.jikan.moe/v4/top/anime?limit=8')
-      .then((res) => {
-        if (!res.ok) throw new Error(`API 请求失败: ${res.status}`)
-        return res.json()
-      })
-      .then((json) => {
+    fetchWithRetry('/api/top/anime?limit=8')
+      .then((json: any) => {
         setAnimeList(json.data)
         setLoading(false)
       })
@@ -62,6 +69,7 @@ function App() {
               placeholder="搜索动漫..."
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               className="w-56 pl-9 pr-4 py-2 rounded-lg bg-white/10 border border-white/10 text-sm text-gray-200 placeholder-gray-500 outline-none focus:border-[#8b5cf6]/50 focus:ring-1 focus:ring-[#8b5cf6]/30 transition-all"
             />
           </div>
