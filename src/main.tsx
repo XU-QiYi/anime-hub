@@ -6,16 +6,21 @@ import App from './App.tsx'
 import AnimeDetail from './pages/AnimeDetail.tsx'
 import Search from './pages/Search.tsx'
 import Favorites from './pages/Favorites.tsx'
+import Player from './pages/Player.tsx'
+import ErrorBoundary from './components/ErrorBoundary.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<App />} />
-        <Route path="/search" element={<Search />} />
-        <Route path="/anime/:id" element={<AnimeDetail />} />
-        <Route path="/favorites" element={<Favorites />} />
-      </Routes>
+      <ErrorBoundary>
+        <Routes>
+          <Route path="/" element={<App />} />
+          <Route path="/search" element={<Search />} />
+          <Route path="/anime/:id" element={<AnimeDetail />} />
+          <Route path="/favorites" element={<Favorites />} />
+          <Route path="/player/:id" element={<Player />} />
+        </Routes>
+      </ErrorBoundary>
     </BrowserRouter>
   </StrictMode>,
 )
