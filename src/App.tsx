@@ -49,7 +49,19 @@ function App() {
         <Link to="/" className="text-2xl font-bold text-[#8b5cf6]">
           AnimeHub
         </Link>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
+          <Link
+            to="/"
+            className="text-sm text-[#a78bfa] font-medium transition-colors"
+          >
+            首页
+          </Link>
+          <Link
+            to="/favorites"
+            className="text-sm text-gray-400 hover:text-white transition-colors"
+          >
+            追番
+          </Link>
           <div className="relative">
             <svg
               className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"

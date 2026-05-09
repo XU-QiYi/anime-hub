@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { fetchWithRetry } from '../lib/fetchWithRetry'
+import { useFavoriteStore } from '../store/useFavoriteStore'
+import { useToast } from '../components/Toast'
 
 interface JikanAnimeDetail {
   mal_id: number
@@ -24,6 +26,27 @@ function AnimeDetail() {
   const [anime, setAnime] = useState<JikanAnimeDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const addFavorite = useFavoriteStore((s) => s.addFavorite)
+  const removeFavorite = useFavoriteStore((s) => s.removeFavorite)
+  const isFavorite = useFavoriteStore((s) => s.isFavorite)
+  const followed = anime ? isFavorite(anime.mal_id) : false
+  const { showToast, toastEl } = useToast()
+
+  function handleToggleFavorite() {
+    if (!anime) return
+    if (followed) {
+      removeFavorite(anime.mal_id)
+      showToast('已取消追番')
+    } else {
+      addFavorite({
+        mal_id: anime.mal_id,
+        title: anime.title,
+        images: anime.images,
+        score: anime.score,
+      })
+      showToast('已添加到追番列表')
+    }
+  }
 
   useEffect(() => {
     setLoading(true)
@@ -46,7 +69,19 @@ function AnimeDetail() {
         <Link to="/" className="text-2xl font-bold text-[#8b5cf6]">
           AnimeHub
         </Link>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
+          <Link
+            to="/"
+            className="text-sm text-gray-400 hover:text-white transition-colors"
+          >
+            首页
+          </Link>
+          <Link
+            to="/favorites"
+            className="text-sm text-gray-400 hover:text-white transition-colors"
+          >
+            追番
+          </Link>
           <div className="relative">
             <svg
               className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
@@ -100,7 +135,21 @@ function AnimeDetail() {
               />
             </div>
             <div className="flex-1 min-w-0">
-              <h1 className="text-3xl font-bold mb-4">{anime.title}</h1>
+              <div className="flex items-center gap-4 mb-4">
+                <h1 className="text-3xl font-bold flex-1 min-w-0 truncate">
+                  {anime.title}
+                </h1>
+                <button
+                  onClick={handleToggleFavorite}
+                  className={`flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium transition-all ${
+                    followed
+                      ? 'bg-white/10 text-gray-400 hover:bg-white/15 hover:text-white border border-white/10'
+                      : 'bg-[#8b5cf6] text-white hover:bg-[#7c3aed]'
+                  }`}
+                >
+                  {followed ? '已追番' : '追番'}
+                </button>
+              </div>
 
               <div className="flex items-center gap-4 mb-6 text-sm text-gray-400">
                 {anime.score != null && (
@@ -143,6 +192,7 @@ function AnimeDetail() {
           </div>
         )}
       </div>
+      {toastEl}
     </div>
   )
 }
