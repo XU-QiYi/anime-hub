@@ -8,6 +8,7 @@ import Search from './pages/Search.tsx'
 import Favorites from './pages/Favorites.tsx'
 import Player from './pages/Player.tsx'
 import Schedule from './pages/Schedule.tsx'
+import Category from './pages/Category.tsx'
 import ErrorBoundary from './components/ErrorBoundary.tsx'
 
 createRoot(document.getElementById('root')!).render(
@@ -21,6 +22,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/favorites" element={<Favorites />} />
           <Route path="/player/:id" element={<Player />} />
           <Route path="/schedule" element={<Schedule />} />
+          <Route path="/category" element={<Category />} />
         </Routes>
       </ErrorBoundary>
     </BrowserRouter>

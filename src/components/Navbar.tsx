@@ -27,6 +27,7 @@ export default function Navbar() {
   const isHome = location.pathname === '/'
   const isFav = location.pathname === '/favorites'
   const isSchedule = location.pathname === '/schedule'
+  const isCategory = location.pathname === '/category'
 
   return (
     <nav
@@ -62,6 +63,14 @@ export default function Navbar() {
             }`}
           >
             时间表
+          </Link>
+          <Link
+            to="/category"
+            className={`text-sm transition-colors ${
+              isCategory ? 'text-[#a78bfa] font-medium' : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            分类
           </Link>
           {location.pathname !== '/search' && (
             <div className="relative">
