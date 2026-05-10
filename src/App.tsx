@@ -47,26 +47,16 @@ function Banner({ items }: { items: JikanAnime[] }) {
   }
 
   return (
-    <section
-      className="mx-6 mt-4 rounded-2xl overflow-hidden relative group"
-      onMouseEnter={pause}
-      onMouseLeave={resume}
-    >
+    <section className="mx-6 mt-4 rounded-2xl overflow-hidden relative group" onMouseEnter={pause} onMouseLeave={resume}>
       <div className="relative h-72 sm:h-80 md:h-[28rem]">
         {items.map((anime, i) => (
-          <div
-            key={anime.mal_id}
-            className="absolute inset-0 transition-opacity duration-700 ease-in-out"
-            style={{ opacity: i === current ? 1 : 0 }}
-          >
-            <img src={anime.images.jpg.large_image_url} alt={anime.title} className="w-full h-full object-cover" />
+          <div key={anime.mal_id} className="absolute inset-0 transition-opacity duration-700 ease-in-out" style={{ opacity: i === current ? 1 : 0 }}>
+            <img src={anime.images.jpg.large_image_url} alt={anime.title} className="w-full h-full object-cover" loading="lazy" />
           </div>
         ))}
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
         <div className="absolute bottom-12 left-0 right-0 p-6 sm:p-8">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 drop-shadow-lg">
-            {items[current].title}
-          </h2>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 drop-shadow-lg">{items[current].title}</h2>
           {items[current].score != null && (
             <div className="flex items-center gap-1.5">
               <span className="text-yellow-400 text-lg">★</span>
@@ -77,13 +67,7 @@ function Banner({ items }: { items: JikanAnime[] }) {
       </div>
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
         {items.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => goTo(i)}
-            className={`h-2 rounded-full transition-all duration-300 ${
-              i === current ? 'bg-[#8b5cf6] w-7' : 'bg-white/40 hover:bg-white/60 w-2'
-            }`}
-          />
+          <button key={i} onClick={() => goTo(i)} className={`h-2 rounded-full transition-all duration-300 ${i === current ? 'bg-[#8b5cf6] w-7' : 'bg-white/40 hover:bg-white/60 w-2'}`} />
         ))}
       </div>
     </section>
@@ -94,7 +78,7 @@ function SkeletonCards() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       {Array.from({ length: 4 }).map((_, i) => (
-        <div key={i} className="rounded-xl overflow-hidden bg-[#141418]">
+        <div key={i} className="rounded-xl overflow-hidden" style={{ backgroundColor: 'var(--bg-secondary)' }}>
           <div className="aspect-[3/4] animate-skeleton" />
           <div className="p-4 space-y-3">
             <div className="h-4 animate-skeleton rounded w-3/4" />
@@ -118,14 +102,13 @@ function App() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white page-enter">
+    <div className="min-h-screen page-enter" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
       <Navbar />
       <Banner items={animeList.slice(0, 3)} />
-
       <section className="px-6 py-12">
-        <h2 className="text-2xl font-bold text-white mb-8">热门推荐</h2>
+        <h2 className="text-2xl font-bold mb-8" style={{ color: 'var(--text-primary)' }}>热门推荐</h2>
         {loading && <SkeletonCards />}
-        {error && <div className="text-center py-16 text-gray-500"><p>加载失败: {error}</p></div>}
+        {error && <div className="text-center py-16" style={{ color: 'var(--text-muted)' }}><p>加载失败: {error}</p></div>}
         {!loading && !error && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {animeList.slice(0, 8).map((anime, index) => (
@@ -134,7 +117,6 @@ function App() {
           </div>
         )}
       </section>
-
       <Footer />
     </div>
   )
