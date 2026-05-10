@@ -43,7 +43,7 @@ function Ranking() {
   return (
     <div className="min-h-screen page-enter" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
       <Navbar />
-      <div className="px-6 py-10 max-w-4xl mx-auto">
+      <div className="px-4 sm:px-6 py-8 sm:py-10 max-w-4xl mx-auto">
         <h2 className="text-2xl font-bold mb-8">排行榜</h2>
 
         <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
@@ -59,7 +59,7 @@ function Ranking() {
         {loading && (
           <div className="space-y-3">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="flex items-center gap-4 p-4 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+                <div key={i} className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)' }}>
                 <div className="w-8 h-8 animate-skeleton rounded" />
                 <div className="w-12 h-16 animate-skeleton rounded-lg flex-shrink-0" />
                 <div className="flex-1 space-y-2">
@@ -80,7 +80,7 @@ function Ranking() {
                 <Link
                   key={anime.mal_id}
                   to={`/anime/${anime.mal_id}`}
-                  className={`flex items-center gap-4 p-4 rounded-xl border transition-all duration-300 group ${
+                  className={`flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl border transition-all duration-300 group ${
                     isTop3 ? 'ring-1' : ''
                   }`}
                   style={{
@@ -89,7 +89,7 @@ function Ranking() {
                   }}
                 >
                   <RankBadge rank={rank} />
-                  <div className="w-12 h-16 flex-shrink-0 rounded-lg overflow-hidden" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
+                  <div className="w-10 sm:w-12 h-14 sm:h-16 flex-shrink-0 rounded-lg overflow-hidden" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
                     <img src={anime.images.jpg.large_image_url} alt={anime.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
                   </div>
                   <div className="flex-1 min-w-0">

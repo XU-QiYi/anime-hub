@@ -38,7 +38,7 @@ function Player() {
   return (
     <div className="min-h-screen page-enter" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
       <Navbar />
-      <div className="max-w-6xl mx-auto px-6 py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {loading && <div className="flex justify-center py-16"><div className="w-8 h-8 border-2 border-[#8b5cf6] border-t-transparent rounded-full animate-spin" /></div>}
         {error && <div className="text-center py-16" style={{ color: 'var(--text-muted)' }}><p>加载失败: {error}</p></div>}
         {anime && (
@@ -47,7 +47,7 @@ function Player() {
             <div className="relative w-full aspect-video rounded-2xl overflow-hidden mb-8 flex flex-col items-center justify-center gap-6 ring-1" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}>
               <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[var(--bg-primary)]/50" />
               <p className="text-lg relative z-10" style={{ color: 'var(--text-muted)' }}>选择平台观看「{anime.title}」</p>
-              <div className="relative z-10 flex flex-wrap justify-center gap-3">
+              <div className="relative z-10 grid grid-cols-2 sm:flex sm:flex-wrap justify-center gap-2 sm:gap-3 px-4">
                 {PLATFORMS.map((p) => (
                   <button key={p.name} onClick={() => window.open(p.buildUrl(anime.title), '_blank')} className="px-6 py-3 rounded-xl text-white font-medium transition-all hover:shadow-lg hover:scale-105" style={{ backgroundColor: p.color }}>
                     {p.name}

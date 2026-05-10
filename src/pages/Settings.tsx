@@ -16,7 +16,7 @@ function Settings() {
   return (
     <div className="min-h-screen page-enter" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
       <Navbar />
-      <div className="px-6 py-10 max-w-2xl mx-auto">
+      <div className="px-4 sm:px-6 py-8 sm:py-10 max-w-2xl mx-auto">
         <h2 className="text-2xl font-bold mb-8">设置</h2>
 
         {/* Theme */}

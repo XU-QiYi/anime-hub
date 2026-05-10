@@ -22,7 +22,7 @@ function History() {
   return (
     <div className="min-h-screen page-enter" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
       <Navbar />
-      <div className="px-6 py-10 max-w-6xl mx-auto">
+      <div className="px-4 sm:px-6 py-8 sm:py-10 max-w-6xl mx-auto">
         <div className="flex items-center gap-3 mb-8">
           <h2 className="text-2xl font-bold">观看历史</h2>
           {history.length > 0 && (

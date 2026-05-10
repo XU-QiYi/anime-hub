@@ -102,7 +102,7 @@ function Category() {
   return (
     <div className="min-h-screen page-enter" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
       <Navbar />
-      <div className="px-6 py-10 max-w-7xl mx-auto">
+      <div className="px-4 sm:px-6 py-8 sm:py-10 max-w-7xl mx-auto">
         <h2 className="text-2xl font-bold mb-8">分类浏览</h2>
         <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
           {GENRES.map((g) => (

@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { fetchWithRetry } from './lib/fetchWithRetry'
 import Navbar from './components/Navbar'
 import AnimeCard from './components/AnimeCard'
@@ -16,6 +16,8 @@ interface JikanAnime {
 function Banner({ items }: { items: JikanAnime[] }) {
   const [current, setCurrent] = useState(0)
   const timerRef = useRef<ReturnType<typeof setInterval>>(null)
+  const touchStartX = useRef(0)
+  const touchStartY = useRef(0)
 
   const startTimer = useCallback(() => {
     timerRef.current = setInterval(() => {
@@ -33,10 +35,29 @@ function Banner({ items }: { items: JikanAnime[] }) {
   function resume() { pause(); startTimer() }
   function goTo(i: number) { setCurrent(i); resume() }
 
+  function handleTouchStart(e: React.TouchEvent) {
+    touchStartX.current = e.touches[0].clientX
+    touchStartY.current = e.touches[0].clientY
+    pause()
+  }
+
+  function handleTouchEnd(e: React.TouchEvent) {
+    const deltaX = e.changedTouches[0].clientX - touchStartX.current
+    const deltaY = e.changedTouches[0].clientY - touchStartY.current
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+      if (deltaX < 0) {
+        setCurrent((prev) => (prev + 1) % items.length)
+      } else {
+        setCurrent((prev) => (prev - 1 + items.length) % items.length)
+      }
+    }
+    resume()
+  }
+
   if (items.length === 0) {
     return (
-      <section className="mx-6 mt-4 rounded-2xl overflow-hidden">
-        <div className="relative h-72 bg-gradient-to-r from-[#8b5cf6] via-[#a78bfa] to-[#6d28d9] flex items-center justify-center">
+      <section className="mx-4 sm:mx-6 mt-4 rounded-2xl overflow-hidden">
+        <div className="relative h-48 sm:h-72 bg-gradient-to-r from-[#8b5cf6] via-[#a78bfa] to-[#6d28d9] flex items-center justify-center">
           <div className="text-center">
             <h2 className="text-4xl font-bold text-white mb-2">热门番剧推荐</h2>
             <p className="text-white/70 text-lg">发现更多精彩动漫内容</p>
@@ -47,7 +68,7 @@ function Banner({ items }: { items: JikanAnime[] }) {
   }
 
   return (
-    <section className="mx-6 mt-4 rounded-2xl overflow-hidden relative group" onMouseEnter={pause} onMouseLeave={resume}>
+      <section className="mx-4 sm:mx-6 mt-4 rounded-2xl overflow-hidden relative group touch-pan-y" onMouseEnter={pause} onMouseLeave={resume} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
       <div className="relative h-72 sm:h-80 md:h-[28rem]">
         {items.map((anime, i) => (
           <div key={anime.mal_id} className="absolute inset-0 transition-opacity duration-700 ease-in-out" style={{ opacity: i === current ? 1 : 0 }}>
@@ -76,7 +97,7 @@ function Banner({ items }: { items: JikanAnime[] }) {
 
 function SkeletonCards() {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
       {Array.from({ length: 4 }).map((_, i) => (
         <div key={i} className="rounded-xl overflow-hidden" style={{ backgroundColor: 'var(--bg-secondary)' }}>
           <div className="aspect-[3/4] animate-skeleton" />
@@ -93,6 +114,7 @@ function SkeletonCards() {
 const PAGE_SIZE = 8
 
 function App() {
+  const navigate = useNavigate()
   const [animeList, setAnimeList] = useState<JikanAnime[]>([])
   const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(true)
@@ -138,13 +160,27 @@ function App() {
   return (
     <div className="min-h-screen page-enter" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
       <Navbar />
+      {/* Mobile search bar */}
+      <div className="md:hidden px-4 mt-3 flex items-center gap-3">
+        <div onClick={() => navigate('/search')} className="flex-1 flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer" style={{ backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border-color)' }}>
+          <svg className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--text-muted)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <span className="text-sm" style={{ color: 'var(--text-muted)' }}>搜索动漫...</span>
+        </div>
+        <Link to="/schedule" className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border-color)' }}>
+          <svg className="w-5 h-5" style={{ color: 'var(--text-muted)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+        </Link>
+      </div>
       <Banner items={animeList.slice(0, 3)} />
-      <section className="px-6 py-12">
+      <section className="px-4 sm:px-6 py-12">
         <h2 className="text-2xl font-bold mb-8" style={{ color: 'var(--text-primary)' }}>热门推荐</h2>
         {loading && <SkeletonCards />}
         {error && <div className="text-center py-16" style={{ color: 'var(--text-muted)' }}><p>加载失败: {error}</p></div>}
         {!loading && !error && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {animeList.map((anime, index) => (
               <AnimeCard key={`${anime.mal_id}-${index}`} anime={anime} index={index % PAGE_SIZE} />
             ))}

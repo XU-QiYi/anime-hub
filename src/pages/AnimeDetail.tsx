@@ -136,7 +136,7 @@ function AnimeDetail() {
           <div className="absolute inset-0 bg-gradient-to-b from-[var(--bg-primary)]/60 via-[var(--bg-primary)]/80 to-[var(--bg-primary)]" />
         </div>
       )}
-      <div className="px-6 -mt-32 max-w-5xl mx-auto relative z-10 pb-20">
+      <div className="px-4 sm:px-6 -mt-20 sm:-mt-32 max-w-5xl mx-auto relative z-10 pb-20">
         <Link to="/" className="inline-flex items-center gap-2 hover:text-[#8b5cf6] transition-colors mb-6" style={{ color: 'var(--text-muted)' }}>
           ← 返回首页
         </Link>
@@ -180,7 +180,7 @@ function AnimeDetail() {
                   </div>
                 )}
 
-                <div className="flex items-center gap-3 mb-6 relative">
+                <div className="flex items-center gap-3 mb-6 relative flex-wrap">
                   {followed ? (
                     <div className="relative">
                       <button onClick={() => setShowStatusMenu(!showStatusMenu)} className={`px-6 py-2.5 rounded-xl text-sm font-medium border transition-all ${STATUS_CONFIG[currentStatus || 'watching'].bg} ${STATUS_CONFIG[currentStatus || 'watching'].color}`}>

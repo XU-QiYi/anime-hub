@@ -82,7 +82,7 @@ function Schedule() {
   return (
     <div className="min-h-screen page-enter" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
       <Navbar />
-      <div className="px-6 py-10 max-w-6xl mx-auto">
+      <div className="px-4 sm:px-6 py-8 sm:py-10 max-w-6xl mx-auto">
         <h2 className="text-2xl font-bold mb-8">新番时间表</h2>
         <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
           {DAY_NAMES.map((name, i) => (
@@ -108,8 +108,8 @@ function Schedule() {
             {currentList.map((anime) => {
               const time = parseTimeFromBroadcast(anime.broadcast?.string ?? null)
               return (
-                <Link key={anime.mal_id} to={`/anime/${anime.mal_id}`} className="flex items-center gap-4 p-4 rounded-xl border transition-all duration-300 group" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}>
-                  <div className="w-16 h-22 flex-shrink-0 rounded-lg overflow-hidden" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
+                <Link key={anime.mal_id} to={`/anime/${anime.mal_id}`} className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl border transition-all duration-300 group" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}>
+                  <div className="w-12 sm:w-16 h-16 sm:h-22 flex-shrink-0 rounded-lg overflow-hidden" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
                     <img src={anime.images.jpg.large_image_url} alt={anime.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
                   </div>
                   <div className="flex-1 min-w-0">

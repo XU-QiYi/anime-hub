@@ -9,6 +9,12 @@ html, body, #root {
   box-sizing: border-box;
 }
 
+@media (max-width: 767px) {
+  #root {
+    padding-bottom: 60px;
+  }
+}
+
 :root {
   --bg-primary: #0a0a0a;
   --bg-secondary: #141418;
