@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import { fetchWithRetry } from '../lib/fetchWithRetry'
 import Navbar from '../components/Navbar'
 import AnimeCard from '../components/AnimeCard'
@@ -24,6 +24,8 @@ const GENRES = [
   { label: '日常', id: 36 },
 ]
 
+const PAGE_SIZE = 20
+
 function CategorySkeleton() {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
@@ -43,17 +45,59 @@ function CategorySkeleton() {
 function Category() {
   const [activeGenre, setActiveGenre] = useState<number | null>(null)
   const [animeList, setAnimeList] = useState<JikanAnime[]>([])
+  const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [hasMore, setHasMore] = useState(true)
+  const sentinelRef = useRef<HTMLDivElement>(null)
+  const prevGenreRef = useRef<number | null>(null)
 
   useEffect(() => {
-    setLoading(true)
-    const url = activeGenre === null
-      ? '/api/top/anime?limit=20'
-      : `/api/anime?genres=${activeGenre}&limit=20`
-    fetchWithRetry(url)
-      .then((json: any) => { setAnimeList(json.data); setLoading(false) })
-      .catch(() => { setAnimeList([]); setLoading(false) })
+    if (prevGenreRef.current !== activeGenre) {
+      prevGenreRef.current = activeGenre
+      setPage(1)
+      setHasMore(true)
+      setLoading(true)
+      setAnimeList([])
+      const url = activeGenre === null
+        ? `/api/top/anime?limit=${PAGE_SIZE}&page=1`
+        : `/api/anime?genres=${activeGenre}&limit=${PAGE_SIZE}&page=1`
+      fetchWithRetry(url)
+        .then((json: any) => { setAnimeList(json.data); setLoading(false) })
+        .catch(() => { setAnimeList([]); setLoading(false) })
+    }
   }, [activeGenre])
+
+  const loadMore = useCallback(async () => {
+    if (loadingMore || !hasMore) return
+    setLoadingMore(true)
+    try {
+      const nextPage = page + 1
+      const url = activeGenre === null
+        ? `/api/top/anime?limit=${PAGE_SIZE}&page=${nextPage}`
+        : `/api/anime?genres=${activeGenre}&limit=${PAGE_SIZE}&page=${nextPage}`
+      const json: any = await fetchWithRetry(url)
+      if (json.data.length === 0) {
+        setHasMore(false)
+      } else {
+        setAnimeList((prev) => [...prev, ...json.data])
+        setPage(nextPage)
+        if (json.data.length < PAGE_SIZE) setHasMore(false)
+      }
+    } catch {}
+    setLoadingMore(false)
+  }, [page, activeGenre, loadingMore, hasMore])
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current
+    if (!sentinel) return
+    const observer = new IntersectionObserver(
+      (entries) => { if (entries[0].isIntersecting) loadMore() },
+      { rootMargin: '200px' }
+    )
+    observer.observe(sentinel)
+    return () => observer.disconnect()
+  }, [loadMore])
 
   return (
     <div className="min-h-screen page-enter" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
@@ -78,10 +122,14 @@ function Category() {
         {!loading && animeList.length > 0 && (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
             {animeList.map((anime, index) => (
-              <AnimeCard key={anime.mal_id} anime={anime} index={index} />
+              <AnimeCard key={`${anime.mal_id}-${index}`} anime={anime} index={index % PAGE_SIZE} />
             ))}
           </div>
         )}
+        <div ref={sentinelRef} className="py-8 text-center">
+          {loadingMore && <p style={{ color: 'var(--text-muted)' }}>加载中...</p>}
+          {!hasMore && !loading && animeList.length > 0 && <p style={{ color: 'var(--text-muted)' }}>没有更多了</p>}
+        </div>
       </div>
       <Footer />
     </div>

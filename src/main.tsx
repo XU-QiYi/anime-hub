@@ -9,6 +9,7 @@ import Favorites from './pages/Favorites.tsx'
 import Player from './pages/Player.tsx'
 import Schedule from './pages/Schedule.tsx'
 import Category from './pages/Category.tsx'
+import Ranking from './pages/Ranking.tsx'
 import History from './pages/History.tsx'
 import Settings from './pages/Settings.tsx'
 import NotFound from './pages/NotFound.tsx'
@@ -29,6 +30,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/player/:id" element={<Player />} />
             <Route path="/schedule" element={<Schedule />} />
             <Route path="/category" element={<Category />} />
+            <Route path="/ranking" element={<Ranking />} />
             <Route path="/history" element={<History />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<NotFound />} />

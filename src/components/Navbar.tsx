@@ -37,6 +37,7 @@ export default function Navbar() {
           <Link to="/favorites" className={linkClass(isActive('/favorites'))}>追番</Link>
           <Link to="/history" className={linkClass(isActive('/history'))}>历史</Link>
           <Link to="/schedule" className={linkClass(isActive('/schedule'))}>时间表</Link>
+          <Link to="/ranking" className={linkClass(isActive('/ranking'))}>排行榜</Link>
           <Link to="/category" className={linkClass(isActive('/category'))}>分类</Link>
           {location.pathname !== '/search' && (
             <div className="relative">
