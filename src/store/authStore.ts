@@ -21,6 +21,7 @@ interface AuthStore {
   signIn: (email: string, password: string) => Promise<{ error?: string }>
   signOut: () => Promise<void>
   updateProfile: (updates: Partial<Profile>) => Promise<{ error?: string }>
+  uploadAvatar: (file: File) => Promise<{ error?: string; url?: string }>
   fetchProfile: () => Promise<void>
 }
 
@@ -38,9 +39,6 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
       user: session?.user ?? null,
       initialized: true,
     })
-    if (session?.user) {
-      get().fetchProfile()
-    }
 
     supabase.auth.onAuthStateChange((_event, session) => {
       set({
@@ -95,15 +93,51 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
     set({ user: null, profile: null, session: null })
   },
 
-  fetchProfile: async () => {
+  uploadAvatar: async (file) => {
     const { user } = get()
-    if (!user) return
+    if (!user) return { error: 'Not authenticated' }
 
-    const { data } = await supabase
+    const ext = file.name.split('.').pop() || 'png'
+    const filePath = `${user.id}/avatar.${ext}`
+
+    const { error: uploadError } = await supabase.storage
+      .from('avatars')
+      .upload(filePath, file, { upsert: true })
+
+    if (uploadError) return { error: uploadError.message }
+
+    const { data: urlData } = supabase.storage
+      .from('avatars')
+      .getPublicUrl(filePath)
+
+    const url = urlData.publicUrl
+    const result = await get().updateProfile({ avatar_url: url })
+    if (result.error) return { error: result.error }
+
+    return { url }
+  },
+
+  fetchProfile: async () => {
+    const { user, profile: existing } = get()
+    if (!user) return
+    if (existing) return
+
+    const { data, error } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', user.id)
       .single()
+
+    if (error) {
+      const username = user.user_metadata?.username || user.email?.split('@')[0] || '用户'
+      const { data: newProfile } = await supabase
+        .from('profiles')
+        .insert({ id: user.id, username })
+        .select()
+        .single()
+      if (newProfile) set({ profile: newProfile })
+      return
+    }
 
     if (data) set({ profile: data })
   },

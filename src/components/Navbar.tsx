@@ -99,8 +99,12 @@ export default function Navbar() {
               )}
             </button>
             {user ? (
-              <Link to="/profile" className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white transition-colors hover:ring-2 hover:ring-[var(--accent)]" style={{ backgroundColor: '#8b5cf6' }}>
-                {(profile?.username || user.email || '?').charAt(0).toUpperCase()}
+              <Link to="/profile" className="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center text-sm font-bold text-white transition-colors hover:ring-2 hover:ring-[var(--accent)]" style={{ backgroundColor: '#8b5cf6' }}>
+                {profile?.avatar_url ? (
+                  <img src={profile.avatar_url} alt="头像" className="w-full h-full object-cover" />
+                ) : (
+                  (profile?.username || user.user_metadata?.username || user.email || '?').charAt(0).toUpperCase()
+                )}
               </Link>
             ) : (
               <Link to="/login" className="text-sm font-medium px-3 py-1.5 rounded-lg transition-colors hover:bg-[var(--bg-tertiary)]" style={{ color: 'var(--text-muted)' }}>
@@ -131,8 +135,12 @@ export default function Navbar() {
               )}
             </button>
             {user ? (
-              <Link to="/profile" className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white transition-colors hover:ring-2 hover:ring-[var(--accent)]" style={{ backgroundColor: '#8b5cf6' }}>
-                {(profile?.username || user.email || '?').charAt(0).toUpperCase()}
+              <Link to="/profile" className="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center text-sm font-bold text-white transition-colors hover:ring-2 hover:ring-[var(--accent)]" style={{ backgroundColor: '#8b5cf6' }}>
+                {profile?.avatar_url ? (
+                  <img src={profile.avatar_url} alt="头像" className="w-full h-full object-cover" />
+                ) : (
+                  (profile?.username || user.user_metadata?.username || user.email || '?').charAt(0).toUpperCase()
+                )}
               </Link>
             ) : (
               <Link to="/login" className="text-sm font-medium px-3 py-1.5 rounded-lg transition-colors hover:bg-[var(--bg-tertiary)]" style={{ color: 'var(--text-muted)' }}>
