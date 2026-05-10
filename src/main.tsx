@@ -12,15 +12,20 @@ import Category from './pages/Category.tsx'
 import Ranking from './pages/Ranking.tsx'
 import History from './pages/History.tsx'
 import Settings from './pages/Settings.tsx'
+import Login from './pages/Login.tsx'
+import Register from './pages/Register.tsx'
+import Profile from './pages/Profile.tsx'
 import NotFound from './pages/NotFound.tsx'
 import ErrorBoundary from './components/ErrorBoundary.tsx'
 import ThemeProvider from './components/ThemeProvider.tsx'
+import AuthProvider from './components/AuthProvider.tsx'
 import BackToTop from './components/BackToTop.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider>
-      <BrowserRouter>
+      <AuthProvider>
+        <BrowserRouter>
         <ErrorBoundary>
           <Routes>
             <Route path="/" element={<App />} />
@@ -33,11 +38,15 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/ranking" element={<Ranking />} />
             <Route path="/history" element={<History />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <BackToTop />
         </ErrorBoundary>
-      </BrowserRouter>
+        </BrowserRouter>
+      </AuthProvider>
     </ThemeProvider>
   </StrictMode>,
 )

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useThemeStore } from '../store/useThemeStore'
+import { useAuthStore } from '../store/authStore'
 
 const TAB_ITEMS = [
   { path: '/', label: '首页', icon: (active: boolean) => (
@@ -32,6 +33,8 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const theme = useThemeStore((s) => s.theme)
   const toggleTheme = useThemeStore((s) => s.toggleTheme)
+  const user = useAuthStore((s) => s.user)
+  const profile = useAuthStore((s) => s.profile)
 
   useEffect(() => {
     function onScroll() { setScrolled(window.scrollY > 50) }
@@ -95,6 +98,15 @@ export default function Navbar() {
                 </svg>
               )}
             </button>
+            {user ? (
+              <Link to="/profile" className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white transition-colors hover:ring-2 hover:ring-[var(--accent)]" style={{ backgroundColor: '#8b5cf6' }}>
+                {(profile?.username || user.email || '?').charAt(0).toUpperCase()}
+              </Link>
+            ) : (
+              <Link to="/login" className="text-sm font-medium px-3 py-1.5 rounded-lg transition-colors hover:bg-[var(--bg-tertiary)]" style={{ color: 'var(--text-muted)' }}>
+                登录
+              </Link>
+            )}
           </div>
         </div>
       </nav>
@@ -118,11 +130,18 @@ export default function Navbar() {
                 </svg>
               )}
             </button>
+            {user ? (
+              <Link to="/profile" className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white transition-colors hover:ring-2 hover:ring-[var(--accent)]" style={{ backgroundColor: '#8b5cf6' }}>
+                {(profile?.username || user.email || '?').charAt(0).toUpperCase()}
+              </Link>
+            ) : (
+              <Link to="/login" className="text-sm font-medium px-3 py-1.5 rounded-lg transition-colors hover:bg-[var(--bg-tertiary)]" style={{ color: 'var(--text-muted)' }}>
+                登录
+              </Link>
+            )}
           </div>
         </div>
       </nav>
-
-      {/* Mobile bottom tab bar */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden border-t backdrop-blur-md" style={{ backgroundColor: 'var(--nav-bg-scroll)', borderColor: 'var(--border-color)' }}>
         <div className="flex items-center justify-around py-2">
           {TAB_ITEMS.map((tab) => {

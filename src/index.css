@@ -29,6 +29,7 @@ html, body, #root {
   --input-bg: rgba(255, 255, 255, 0.1);
   --input-text: #e5e5e5;
   --input-placeholder: #6b7280;
+  --accent: #8b5cf6;
 }
 
 [data-theme="light"] {
@@ -45,6 +46,7 @@ html, body, #root {
   --input-bg: rgba(0, 0, 0, 0.05);
   --input-text: #1a1a1a;
   --input-placeholder: #9ca3af;
+  --accent: #7c3aed;
 }
 
 @keyframes fade-in {
