@@ -1,5 +1,3 @@
-import { Link } from 'react-router-dom'
-
 export default function Footer() {
   return (
     <footer className="border-t py-8 text-center text-xs mt-12" style={{ borderColor: 'var(--border-color)', color: 'var(--text-muted)' }}>

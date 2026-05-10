@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { useFavoriteStore, STATUS_CONFIG, type FavoriteStatus } from '../store/useFavoriteStore'
+import { useFavoriteStore, STATUS_CONFIG } from '../store/useFavoriteStore'
 
 interface JikanAnime {
   mal_id: number

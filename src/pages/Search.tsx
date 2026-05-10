@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { fetchWithRetry } from '../lib/fetchWithRetry'
 import AnimeCard from '../components/AnimeCard'
@@ -197,8 +197,8 @@ function Search() {
             )}
             {!loading && !error && animeList.length > 0 && (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-6 mt-6">
-                {animeList.map((anime, index) => (
-                  <AnimeCard key={anime.mal_id} anime={anime} index={index} />
+                {animeList.map((anime) => (
+                  <AnimeCard key={anime.mal_id} anime={anime} />
                 ))}
               </div>
             )}

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { fetchWithRetry } from '../lib/fetchWithRetry'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
