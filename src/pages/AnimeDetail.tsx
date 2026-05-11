@@ -6,6 +6,7 @@ import { useHistoryStore } from '../store/useHistoryStore'
 import { useToast } from '../components/Toast'
 import Navbar from '../components/Navbar'
 import AnimeCard from '../components/AnimeCard'
+import CommentSection from '../components/CommentSection'
 
 interface JikanAnimeDetail {
   mal_id: number
@@ -274,6 +275,9 @@ function AnimeDetail() {
                 )}
               </div>
             )}
+
+            {/* Comments */}
+            <CommentSection animeId={anime.mal_id} />
 
             {/* Related Anime */}
             {relatedAnime.length > 0 && (
