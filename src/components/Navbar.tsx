@@ -55,7 +55,7 @@ export default function Navbar() {
     <>
       {/* Desktop top navbar */}
       <nav
-        className={`sticky top-0 z-50 backdrop-blur-md border-b transition-colors duration-300 hidden md:block ${scrolled ? 'border-[var(--border-color)]' : 'border-transparent'}`}
+        className={`sticky top-0 z-50 backdrop-blur-md border-b hidden md:block ${scrolled ? 'border-[var(--border-color)]' : 'border-transparent'}`}
         style={{ backgroundColor: scrolled ? 'var(--nav-bg-scroll)' : 'var(--nav-bg)' }}
       >
         <div className="flex items-center justify-between px-6 py-3 max-w-7xl mx-auto">
@@ -117,7 +117,7 @@ export default function Navbar() {
 
       {/* Mobile top bar */}
       <nav
-        className={`sticky top-0 z-50 md:hidden backdrop-blur-md border-b transition-colors duration-300 ${scrolled ? 'border-[var(--border-color)]' : 'border-transparent'}`}
+        className={`sticky top-0 z-50 md:hidden backdrop-blur-md border-b ${scrolled ? 'border-[var(--border-color)]' : 'border-transparent'}`}
         style={{ backgroundColor: scrolled ? 'var(--nav-bg-scroll)' : 'var(--nav-bg)' }}
       >
         <div className="flex items-center justify-between px-4 py-3">
@@ -150,7 +150,7 @@ export default function Navbar() {
           </div>
         </div>
       </nav>
-      <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden border-t backdrop-blur-md" style={{ backgroundColor: 'var(--nav-bg-scroll)', borderColor: 'var(--border-color)' }}>
+      <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden border-t backdrop-blur-md" style={{ backgroundColor: 'var(--nav-bg-scroll)', borderColor: 'var(--border-color)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
         <div className="flex items-center justify-around py-2">
           {TAB_ITEMS.map((tab) => {
             const active = isActive(tab.path)
