@@ -30,3 +30,5 @@ dist-ssr
 # Build artifacts
 *.apk
 *.idsig
+*.keystore
+*.jks
