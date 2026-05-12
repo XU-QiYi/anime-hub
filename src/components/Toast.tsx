@@ -6,15 +6,55 @@ interface ToastProps {
 }
 
 function Toast({ message, onDone }: ToastProps) {
+  const [exiting, setExiting] = useState(false)
+
   useEffect(() => {
-    const timer = setTimeout(onDone, 2000)
-    return () => clearTimeout(timer)
+    const timer = setTimeout(() => setExiting(true), 1800)
+    const remove = setTimeout(onDone, 2000)
+    return () => { clearTimeout(timer); clearTimeout(remove) }
   }, [onDone])
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 px-5 py-3 rounded-xl bg-gray-900 border border-white/10 text-white text-sm shadow-lg animate-fade-in">
-      {message}
-    </div>
+    <>
+      {/* Mobile: slide down from top */}
+      <div
+        className={`
+          fixed z-50 top-[calc(env(safe-area-inset-top)+12px)]
+          left-1/2 -translate-x-1/2 w-fit min-w-32 max-w-[85vw]
+          px-4 py-2
+          rounded-xl text-sm text-center whitespace-nowrap
+          border shadow-lg backdrop-blur-md
+          md:hidden
+          ${exiting ? 'animate-slide-up' : 'animate-slide-down'}
+        `}
+        style={{
+          backgroundColor: 'var(--bg-secondary)',
+          borderColor: 'var(--border-color)',
+          color: 'var(--text-primary)',
+        }}
+      >
+        {message}
+      </div>
+
+      {/* Desktop: slide in from right */}
+      <div
+        className={`
+          fixed z-50 top-20 right-6 max-w-sm
+          hidden md:block
+          px-5 py-3
+          rounded-xl text-sm whitespace-nowrap
+          border shadow-lg backdrop-blur-md
+          ${exiting ? 'animate-slide-out-right' : 'animate-slide-in-right'}
+        `}
+        style={{
+          backgroundColor: 'var(--bg-secondary)',
+          borderColor: 'var(--border-color)',
+          color: 'var(--text-primary)',
+        }}
+      >
+        {message}
+      </div>
+    </>
   )
 }
 

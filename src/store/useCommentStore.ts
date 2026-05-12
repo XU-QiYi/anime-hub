@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import type { Comment } from '../lib/commentApi'
-import { fetchComments, addComment as apiAdd, updateComment as apiUpdate, deleteComment as apiDelete } from '../lib/commentApi'
+import { fetchComments, addComment as apiAdd, updateComment as apiUpdate, deleteComment as apiDelete, toggleLike as apiToggleLike } from '../lib/commentApi'
 
 interface CommentStore {
   comments: Comment[]
@@ -9,6 +9,7 @@ interface CommentStore {
   addComment: (animeId: number, content: string) => Promise<boolean>
   updateComment: (commentId: string, content: string) => Promise<void>
   deleteComment: (commentId: string) => Promise<void>
+  toggleLike: (commentId: string) => Promise<void>
 }
 
 export const useCommentStore = create<CommentStore>()((set, get) => ({
@@ -59,6 +60,19 @@ export const useCommentStore = create<CommentStore>()((set, get) => ({
       await apiDelete(commentId)
     } catch {
       set({ comments: prev })
+    }
+  },
+
+  toggleLike: async (commentId) => {
+    try {
+      const { liked, likes } = await apiToggleLike(commentId)
+      set((state) => ({
+        comments: state.comments.map((c) =>
+          c.id === commentId ? { ...c, likes, isLikedByCurrentUser: liked } : c
+        ),
+      }))
+    } catch {
+      // noop
     }
   },
 }))

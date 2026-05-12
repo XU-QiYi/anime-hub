@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import type { Comment } from '../lib/commentApi'
 import { useAuthStore } from '../store/authStore'
 import { useCommentStore } from '../store/useCommentStore'
+import { useToast } from './Toast'
 
 interface Props {
   comment: Comment
@@ -26,11 +27,13 @@ function timeAgo(dateStr: string): string {
 
 export default function CommentItem({ comment }: Props) {
   const user = useAuthStore((s) => s.user)
-  const { updateComment, deleteComment } = useCommentStore()
+  const { updateComment, deleteComment, toggleLike } = useCommentStore()
+  const { showToast, toastEl } = useToast()
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState(comment.content)
   const [saving, setSaving] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const likeLockRef = useRef(false)
 
   const isOwn = user?.id === comment.user_id
   const username = comment.profiles?.username || '用户'
@@ -58,7 +61,19 @@ export default function CommentItem({ comment }: Props) {
     setConfirmDelete(false)
   }
 
+  const handleLike = useCallback(async () => {
+    if (!user) {
+      showToast('请先登录后再点赞')
+      return
+    }
+    if (likeLockRef.current) return
+    likeLockRef.current = true
+    await toggleLike(comment.id)
+    setTimeout(() => { likeLockRef.current = false }, 300)
+  }, [user, comment.id, toggleLike, showToast])
+
   return (
+    <>
     <div className="flex gap-3 p-4 rounded-xl border" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}>
       {avatarUrl ? (
         <img src={avatarUrl} alt="" className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
@@ -104,25 +119,46 @@ export default function CommentItem({ comment }: Props) {
           </p>
         )}
 
-        {isOwn && !editing && (
-          <div className="flex items-center gap-3 mt-2">
-            <button onClick={() => setEditing(true)} className="text-xs transition-colors hover:text-[#8b5cf6]" style={{ color: 'var(--text-muted)' }}>
-              编辑
-            </button>
-            {confirmDelete ? (
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-red-400">确认删除？</span>
-                <button onClick={handleDelete} className="text-xs text-red-400 hover:text-red-300 transition-colors">确定</button>
-                <button onClick={() => setConfirmDelete(false)} className="text-xs transition-colors hover:text-[#8b5cf6]" style={{ color: 'var(--text-muted)' }}>取消</button>
-              </div>
+        <div className="flex items-center justify-between mt-2">
+          <button
+            onClick={handleLike}
+            className="flex items-center gap-1.5 text-xs transition-colors group"
+            style={{ color: comment.isLikedByCurrentUser ? undefined : 'var(--text-muted)' }}
+          >
+            {comment.isLikedByCurrentUser ? (
+              <svg className="w-4 h-4 text-red-500 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+              </svg>
             ) : (
-              <button onClick={() => setConfirmDelete(true)} className="text-xs transition-colors hover:text-red-400" style={{ color: 'var(--text-muted)' }}>
-                删除
-              </button>
+              <svg className="w-4 h-4 text-gray-400 group-hover:text-red-400 group-hover:scale-110 transition-all" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+              </svg>
             )}
-          </div>
-        )}
+            <span className={comment.isLikedByCurrentUser ? 'text-red-500' : ''}>{comment.likes}</span>
+          </button>
+
+          {isOwn && !editing && (
+            <div className="flex items-center gap-3">
+              <button onClick={() => setEditing(true)} className="text-xs transition-colors hover:text-[#8b5cf6]" style={{ color: 'var(--text-muted)' }}>
+                编辑
+              </button>
+              {confirmDelete ? (
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-red-400">确认删除？</span>
+                  <button onClick={handleDelete} className="text-xs text-red-400 hover:text-red-300 transition-colors">确定</button>
+                  <button onClick={() => setConfirmDelete(false)} className="text-xs transition-colors hover:text-[#8b5cf6]" style={{ color: 'var(--text-muted)' }}>取消</button>
+                </div>
+              ) : (
+                <button onClick={() => setConfirmDelete(true)} className="text-xs transition-colors hover:text-red-400" style={{ color: 'var(--text-muted)' }}>
+                  删除
+                </button>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </div>
+    {toastEl}
+    </>
   )
 }
