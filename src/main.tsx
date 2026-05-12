@@ -15,6 +15,7 @@ import Settings from './pages/Settings.tsx'
 import Login from './pages/Login.tsx'
 import Register from './pages/Register.tsx'
 import Profile from './pages/Profile.tsx'
+import EditProfile from './pages/EditProfile.tsx'
 import NotFound from './pages/NotFound.tsx'
 import ErrorBoundary from './components/ErrorBoundary.tsx'
 import ThemeProvider from './components/ThemeProvider.tsx'
@@ -41,6 +42,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/edit-profile" element={<EditProfile />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <BackToTop />

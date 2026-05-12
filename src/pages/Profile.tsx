@@ -24,6 +24,7 @@ function Profile() {
   const uploadAvatar = useAuthStore((s) => s.uploadAvatar)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [uploading, setUploading] = useState(false)
+  const [showBioModal, setShowBioModal] = useState(false)
 
   const handleSignOut = async () => {
     await signOut()
@@ -79,49 +80,85 @@ function Profile() {
 
   const displayName = profile?.username || user.user_metadata?.username || user.email?.split('@')[0] || '用户'
   const initial = displayName.charAt(0).toUpperCase()
+  const isLongBio = (profile?.bio?.length || 0) > 50
 
   return (
     <div className="min-h-screen page-enter" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
       <Navbar />
       <div className="px-4 sm:px-6 py-8 sm:py-10 max-w-2xl mx-auto">
         {/* User Info */}
-        <div className="flex items-center gap-4 mb-8">
-          <button
-            type="button"
-            onClick={handleAvatarClick}
-            className="relative w-16 h-16 rounded-full shrink-0 overflow-hidden group focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
-          >
-            {profile?.avatar_url ? (
-              <img src={profile.avatar_url} alt="头像" className="w-full h-full object-cover" />
-            ) : (
-              <div
-                className="w-full h-16 rounded-full flex items-center justify-center text-2xl font-bold text-white"
-                style={{ backgroundColor: '#8b5cf6' }}
-              >
-                {initial}
-              </div>
-            )}
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-              {uploading ? (
-                <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+        <div className="rounded-xl border p-5 mb-8" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}>
+          <div className="flex items-center gap-4">
+            <button
+              type="button"
+              onClick={handleAvatarClick}
+              className="relative w-16 h-16 rounded-full shrink-0 overflow-hidden group focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+            >
+              {profile?.avatar_url ? (
+                <img src={profile.avatar_url} alt="头像" className="w-full h-full object-cover" />
               ) : (
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
+                <div
+                  className="w-full h-16 rounded-full flex items-center justify-center text-2xl font-bold text-white"
+                  style={{ backgroundColor: '#8b5cf6' }}
+                >
+                  {initial}
+                </div>
+              )}
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                {uploading ? (
+                  <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                )}
+              </div>
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleAvatarUpload}
+            />
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <p className="text-lg font-semibold">{displayName}</p>
+                <button
+                  onClick={() => navigate('/edit-profile')}
+                  className="p-1 rounded-lg transition-colors hover:bg-[var(--bg-tertiary)]"
+                  aria-label="编辑资料"
+                >
+                  <svg className="w-4 h-4" style={{ color: 'var(--text-muted)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </button>
+              </div>
+              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>账号</p>
+              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{user.email}</p>
+            </div>
+          </div>
+
+          <div className="mt-4 pt-4" style={{ borderTop: '1px solid var(--border-color)' }}>
+            <p className="text-xs mb-1" style={{ color: 'var(--text-muted)' }}>简介</p>
+            <div className="relative">
+              <p
+                className={`text-sm ${isLongBio ? 'line-clamp-2 pr-16' : ''}`}
+                style={{ color: profile?.bio ? 'var(--text-primary)' : 'var(--text-muted)' }}
+              >
+                {profile?.bio || '暂无简介'}
+              </p>
+              {isLongBio && (
+                <button
+                  onClick={() => setShowBioModal(true)}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 text-xs transition-colors hover:text-[#8b5cf6]"
+                  style={{ color: 'var(--text-muted)' }}
+                >
+                  查看更多
+                </button>
               )}
             </div>
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={handleAvatarUpload}
-          />
-          <div>
-            <p className="text-lg font-semibold">{displayName}</p>
-            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{user.email}</p>
           </div>
         </div>
 
@@ -155,6 +192,37 @@ function Profile() {
         </button>
       </div>
       <Footer />
+
+      {/* Bio Modal */}
+      {showBioModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
+          onClick={() => setShowBioModal(false)}
+        >
+          <div
+            className="w-full max-w-md rounded-xl border p-6 shadow-xl animate-fade-in"
+            style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>简介</p>
+              <button
+                onClick={() => setShowBioModal(false)}
+                className="p-1 rounded-lg transition-colors hover:bg-[var(--bg-tertiary)]"
+                aria-label="关闭"
+              >
+                <svg className="w-5 h-5" style={{ color: 'var(--text-muted)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <p className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--text-secondary)' }}>
+              {profile?.bio}
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -73,37 +73,13 @@ export async function deleteComment(commentId: string): Promise<void> {
 }
 
 export async function toggleLike(commentId: string): Promise<{ liked: boolean; likes: number }> {
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Not authenticated')
+  const { data, error } = await supabase.rpc('toggle_comment_like', {
+    p_comment_id: commentId,
+  })
 
-  const { data: existing } = await supabase
-    .from('comment_likes')
-    .select('id')
-    .eq('user_id', user.id)
-    .eq('comment_id', commentId)
-    .maybeSingle()
+  if (error) throw error
 
-  if (existing) {
-    await supabase.from('comment_likes').delete().eq('id', existing.id)
-    const { data: comment } = await supabase
-      .from('comments')
-      .select('likes')
-      .eq('id', commentId)
-      .single()
-    const newLikes = Math.max(0, (comment?.likes ?? 1) - 1)
-    await supabase.from('comments').update({ likes: newLikes }).eq('id', commentId)
-    return { liked: false, likes: newLikes }
-  } else {
-    await supabase.from('comment_likes').insert({ user_id: user.id, comment_id: commentId })
-    const { data: comment } = await supabase
-      .from('comments')
-      .select('likes')
-      .eq('id', commentId)
-      .single()
-    const newLikes = (comment?.likes ?? 0) + 1
-    await supabase.from('comments').update({ likes: newLikes }).eq('id', commentId)
-    return { liked: true, likes: newLikes }
-  }
+  return { liked: data.liked, likes: data.likes }
 }
 
 export async function isLikedByUser(commentId: string): Promise<boolean> {
